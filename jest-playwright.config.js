@@ -5,5 +5,5 @@ module.exports = {
     contextOptions: {
         acceptDownloads: true
     },
-    browsers: ['chromium'] // firefox ? // webkit ?
+    browsers: ['chromium']
 }

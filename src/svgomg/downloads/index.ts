@@ -1,1 +1,1 @@
-export const downloadsPath = './src/modules/svgomg/downloads/'
+export const downloadsPath = './src/svgomg/downloads/'
