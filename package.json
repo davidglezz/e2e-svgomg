@@ -1,0 +1,32 @@
+{
+  "name": "e2e-svgomg-playwright-ts",
+  "version": "1.0.0",
+  "description": "e2e-svgomg-playwright-ts",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/garciallorente-fer/e2e-svgomg"
+  },
+  "author": "Fernando Garcia Llorente",
+  "dependencies": {
+    "date-fns": "^2.22.1",
+    "jest": "^27.0.6",
+    "jest-html-reporters": "^2.1.6",
+    "jest-junit": "^12.2.0",
+    "jest-playwright-preset": "^1.7.0",
+    "playwright": "^1.12.3",
+    "playwright-core": "^1.12.3",
+    "ts-jest": "^27.0.3",
+    "typescript": "^4.3.5",
+    "wait-for-expect": "^3.0.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.23",
+    "@typescript-eslint/eslint-plugin": "^4.28.2",
+    "@typescript-eslint/parser": "^4.28.2",
+    "eslint": "^7.30.0",
+    "playwright-cli": "^0.180.0"
+  }
+}

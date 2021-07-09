@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "commonjs",
+        "strictPropertyInitialization": false,
+        "baseUrl": "./src/",
+        "types": [
+            "jest",
+            "jest-playwright-preset",
+            "expect-playwright"
+        ],
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true
+    }
+}
