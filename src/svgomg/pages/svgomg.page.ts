@@ -1,13 +1,14 @@
 import { BasePage } from 'pages/base.page'
 import { Element, Button } from 'components'
-import { CheckInput, TextInput } from 'components/form'
-import { CheckSpanInput, CheckSwitchInput } from 'modules/svgomg/components'
+import { TextInput } from 'components/form/inputs'
+import { CheckSpanInput, CheckSwitchInput } from 'svgomg/components'
 import { classNameProperty } from 'components/data'
-import { ComponentsStatusData } from 'modules/svgomg/model'
+import { ComponentsStatusData } from 'svgomg/model'
 import { svgomgUrl, svgomgGithubUrl, svgomgGithubReadmeUrl } from 'data/routing.data'
 import { svgImageName } from 'docs'
-import { downloadsPath } from 'modules/svgomg/downloads'
+import { downloadsPath } from 'svgomg/downloads'
 import { ApiInterception } from 'utils'
+import { readFileSync } from 'fs'
 
 
 export class SvgomgPage extends BasePage {
@@ -21,43 +22,42 @@ export class SvgomgPage extends BasePage {
         }
     }
 
-    private readonly toolbar = new Element('div.toolbar') // Active
+    private readonly toolbar = new Element('div.toolbar')
 
     private readonly menuButton = new Button('button.menu-btn')
     private readonly imageRadio = new CheckSpanInput('input[type=radio][value=image]')
     private readonly markupRadio = new CheckSpanInput('input[type=radio][value=code]')
 
 
-    private readonly navMenu = new Element('nav.menu') // Hidden
+    private readonly navMenu = new Element('nav.menu')
 
     private readonly openSVGButton = new Button('div[role=button].load-file')
     private readonly pasteMarkupButton = new Button('span.label-txt:has-text("Paste markup")')
     private readonly pasteMarkupText = new TextInput('textarea.paste-input')
-    // DOUBT with these 2
     private readonly demoButton = new Button('div[role=button].load-demo')
     private readonly contributeButton = new Button(`a[href="${svgomgGithubUrl}"]`)
     private readonly aboutButton = new Button(`a[href="${svgomgGithubReadmeUrl}"]`)
 
 
-    private readonly output = new Element('div.output') // Where the SVG displays
+    private readonly output = new Element('div.output')
 
-    private readonly actionButtonContainer = new Element('div.action-button-container') // ACTIVE
+    private readonly actionButtonContainer = new Element('div.action-button-container')
     private readonly previewVividBackgroundButton = new Button('div[role=button][title="Preview on vivid background"]')
     private readonly copyAsTextButton = new Button('div[role=button][title="Copy as text"]')
     private readonly diffResults = new Element('span.diff')
     private readonly downloadLinkButton = new Button('a[title="Download"]')
 
-    private readonly svgOutput = new Element('div.svg-output') // ACTIVE
+    private readonly svgOutput = new Element('div.svg-output')
     private readonly svgIFrameSelector = 'iframe.svg-frame'
-    private readonly svgSelector = 'svg' // [xmlns="http://www.w3.org/2000/svg"] // DOUBT
+    private readonly svgSelector = 'svg'
 
-    private readonly codeOutput = new Element('div.code-output') // ACTIVE
+    private readonly codeOutput = new Element('div.code-output')
     private readonly xmlInstructionsCode = new Element('code span.prolog')
     private readonly commentCode = new Element('code span.comment')
     private readonly metadataCode = new Element('code span:has-text("metadata")')
 
 
-    private readonly settings = new Element('div.settings') // Active
+    private readonly settings = new Element('div.settings')
 
     private readonly globalSection = new Element('section.global')
     private readonly pluginsSection = new Element('section.plugins')
@@ -73,10 +73,12 @@ export class SvgomgPage extends BasePage {
         await Promise.all([
             this.loadToolBar({ active: componentsStatusData.activeToolBar }),
             this.loadMenu({ hidden: componentsStatusData.hiddenMenu }),
-            this.loadOutput({ active: componentsStatusData.activeOutput }, componentsStatusData.typeOfOutput),
+            componentsStatusData.typeOfOutput === 'svg' && this.loadSvgOutput({ active: componentsStatusData.activeOutput }),
+            componentsStatusData.typeOfOutput === 'code' && this.loadCodeOutput({ active: componentsStatusData.activeOutput }),
             this.loadSettings({ active: componentsStatusData.activeSettings })
         ])
     }
+
 
     private async loadToolBar(isToolbarActive: { active: boolean }): Promise<void> {
         await this.toolbar.exists()
@@ -87,6 +89,7 @@ export class SvgomgPage extends BasePage {
             this.markupRadio.exists()
         ])
     }
+
 
     private async loadMenu(isMenuHidden: { hidden: boolean }): Promise<void> {
         await this.navMenu.exists(isMenuHidden.hidden ? { hidden: true } : undefined)
@@ -99,7 +102,24 @@ export class SvgomgPage extends BasePage {
         ])
     }
 
-    private async loadOutput(isOutputActive: { active: boolean }, typeOfOutput: 'svg' | 'code'): Promise<void> {
+
+    private async loadSvgOutput(isOutputActive: { active: boolean }): Promise<void> {
+        await this.loadOutput(isOutputActive)
+        await Promise.all([
+            this.svgOutput.exists(),
+            this.codeOutput.notExists()
+        ])
+    }
+
+    private async loadCodeOutput(isOutputActive: { active: boolean }): Promise<void> {
+        await this.loadOutput(isOutputActive)
+        await Promise.all([
+            this.codeOutput.exists(),
+            this.svgOutput.notExists()
+        ])
+    }
+
+    private async loadOutput(isOutputActive: { active: boolean }): Promise<void> {
         await this.output.exists()
         await Promise.all([
             this.actionButtonContainer.exists(),
@@ -111,23 +131,8 @@ export class SvgomgPage extends BasePage {
             this.diffResults.exists(isOutputActive.active ? undefined : { hidden: true }),
             this.downloadLinkButton.exists()
         ])
-        switch (typeOfOutput) {
-        case 'svg':
-            await Promise.all([
-                this.svgOutput.exists(),
-                // this.svgOutput.checkActive(isOutputActive.active), // BUG ? always active
-                this.codeOutput.notExists()
-            ])
-            break
-        case 'code':
-            await Promise.all([
-                this.codeOutput.exists(),
-                // this.codeOutput.checkActive(isOutputActive.active), // BUG ? always active
-                this.svgOutput.notExists()
-            ])
-            break
-        }
     }
+
 
     private async loadSettings(settingsIsActive: { active: boolean }): Promise<void> {
         await this.settings.exists()
@@ -201,24 +206,28 @@ export class SvgomgPage extends BasePage {
     }
 
 
-    public async downloadSvg(): Promise<void> {
+    public async downloadSvg(svgName: string): Promise<void> {
         const [download] = await Promise.all([
             page.waitForEvent('download'),
             this.downloadLinkButton.click()
         ])
-        await download.saveAs(downloadsPath + 'downloadImage.svg')
+        await download.saveAs(downloadsPath + svgName)
     }
 
-    public async getHrefSvg(): Promise<string> {
-        return await this.downloadLinkButton.getElementProperty(['href'])
-    }
+    // public async getHrefSvg(): Promise<string> {
+    //     return await this.downloadLinkButton.getElementProperty(['href'])
+    // }
 
-    public async getSvgInnerHtml(url: string): Promise<string> {
-        const newTab = await context.newPage()
-        await newTab.goto(url)
-        const svgInnerHtml = await newTab.innerHTML('svg')
-        await newTab.close()
-        return svgInnerHtml
+    // public async getSvgInnerHtml(url: string): Promise<string> {
+    //     const newTab = await context.newPage()
+    //     await newTab.goto(url)
+    //     const svgInnerHtml = await newTab.innerHTML('svg')
+    //     await newTab.close()
+    //     return svgInnerHtml
+    // }
+
+    public checkDownloadedSvg(svgName: string, attributeToCheck: string): void {
+        expect(readFileSync(downloadsPath + svgName, 'utf-8')).toContain(attributeToCheck)
     }
 
 
@@ -230,49 +239,43 @@ export class SvgomgPage extends BasePage {
     }
 
 
-    public async switchOutput(output: 'svg' | 'code'): Promise<void> {
-        switch (output) {
-        case 'svg':
-            // await Promise.all([
-            //     ApiInterception.waitForRequest({ url: '', status: 200, searchParams: ['w3', 'org'] }), // request?
-            //     this.imageRadio.checkOption()
-            // ])
-            // DOUBT
-            await this.imageRadio.checkOption()
-            await this.svgOutput.exists()
-            await this.svgOutput.checkActive(true)
-            break
-        case 'code':
-            await this.markupRadio.checkOption()
-            await this.codeOutput.exists()
-            await this.codeOutput.checkActive(true)
-            break
-        }
+    public async clickSvgOption(): Promise<void> {
+        // await Promise.all([
+        //     ApiInterception.waitForRequest({ url: '', status: 200, searchParams: ['w3', 'org'] }), // request?
+        //     this.imageRadio.checkOption()
+        // ])
+        // DOUBT
+        await this.imageRadio.checkOption()
+        await this.svgOutput.exists()
+        await this.svgOutput.checkActive(true)
+
+    }
+
+    public async clickCodeOption(): Promise<void> {
+        await this.markupRadio.checkOption()
+        await this.codeOutput.exists()
+        await this.codeOutput.checkActive(true)
     }
 
 
-    // private readonly commentCode = new Element('code span.comment')
-    // private readonly metadataCode = new Element('code span:has-text("metadata")')
-    // private readonly xmlInstructionsCode = new Element('code span.prolog')
-
     public async removeXmlInstructionsCheck(): Promise<void> {
-        await this.removeXmlInstructionsCheckbox.uncheckOption() // check ?? type=checkbox
+        await this.removeXmlInstructionsCheckbox.uncheckOption()
         await this.xmlInstructionsCode.exists()
-        await this.removeXmlInstructionsCheckbox.checkOption() // check ?? type=checkbox
+        await this.removeXmlInstructionsCheckbox.checkOption()
         await this.xmlInstructionsCode.notExists()
     }
 
     public async removeCommentsCheck(): Promise<void> {
-        await this.removeCommentsCheckbox.uncheckOption() // check ?? type=checkbox
+        await this.removeCommentsCheckbox.uncheckOption()
         await this.commentCode.exists()
-        await this.removeCommentsCheckbox.checkOption() // check ?? type=checkbox
+        await this.removeCommentsCheckbox.checkOption()
         await this.commentCode.notExists()
     }
 
     public async removeMetadataCheck(): Promise<void> {
-        await this.removeMetadataCheckbox.uncheckOption() // check ?? type=checkbox
+        await this.removeMetadataCheckbox.uncheckOption()
         await this.metadataCode.exists()
-        await this.removeMetadataCheckbox.checkOption() // check ?? type=checkbox
+        await this.removeMetadataCheckbox.checkOption()
         await this.metadataCode.notExists()
     }
 

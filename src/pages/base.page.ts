@@ -1,6 +1,4 @@
 import { Frame } from 'playwright-core'
-import { readFileSync } from 'fs'
-import { cookiesPath } from 'modules/login/cookies'
 import waitForExpect from 'wait-for-expect'
 
 
@@ -46,13 +44,6 @@ export class BasePage {
 
     public async takeScreenshot(testName: string): Promise<void> {
         await page.screenshot({ path: `screenshots/${browserName}_${testName}.png`, fullPage: true, timeout: 7500 })
-    }
-
-
-    public async addCookies(): Promise<void> {
-        const cookies = readFileSync(cookiesPath, 'utf8')
-        const deserializedCookies = JSON.parse(cookies)
-        await context.addCookies(deserializedCookies)
     }
 
 

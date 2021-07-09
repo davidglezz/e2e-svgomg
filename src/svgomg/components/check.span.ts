@@ -1,4 +1,4 @@
-import { CheckInput } from 'components/form'
+import { CheckInput } from 'components/form/inputs'
 import { checkedProperty, classNameProperty, disabledProperty } from 'components/data'
 import waitForExpect from 'wait-for-expect'
 
