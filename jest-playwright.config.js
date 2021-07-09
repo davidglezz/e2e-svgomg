@@ -1,6 +1,6 @@
 module.exports = {
     launchOptions: {
-        headless: true
+        headless: false
     },
     contextOptions: {
         acceptDownloads: true

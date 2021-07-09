@@ -1,5 +1,5 @@
 # Introduction
-E2E tests for SVGOMG application by Fernando Garcia Llorente - Automated Tests using PlayWright (Node automation library) and Jest (JavaScript testing framework)
+E2E tests for SVGOMG application by Fernando Garcia Llorente - Written in Typescript, using Playwright and Jest
 
 # Getting Started
 1.	Install the newest NodeJS version (16.x)

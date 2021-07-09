@@ -58,10 +58,21 @@ export class Element {
     }
 
 
+    public async getElementProperty<T>(properties: string[]): Promise<T> {
+        let propertyHandle = await this.getElement() as JSHandle
+        for (const property of properties) {
+            propertyHandle = await propertyHandle.getProperty(property)
+        }
+        const propertyValue: T = await propertyHandle.jsonValue()
+        return propertyValue
+    }
+
+
     public async exists(state?: { hidden?: true, disabled?: true }): Promise<void> {
         await this.checkHiddenState(state?.hidden)
         await this.checkDisabledState(state?.disabled)
     }
+
 
     protected async checkHiddenState(hidden?: true): Promise<void> {
         const element = await this.getElement()
@@ -86,6 +97,7 @@ export class Element {
             throw new Error(error.message)
         }
     }
+
 
     protected async checkDisabledState(disabled?: true): Promise<void> {
         const element = await this.getElement()
@@ -115,58 +127,6 @@ export class Element {
             throw new Error(error.message)
         }
     }
-
-
-    public async getElementProperty<T>(properties: string[]): Promise<T> {
-        let propertyHandle = await this.getElement() as JSHandle
-        for (const property of properties) {
-            propertyHandle = await propertyHandle.getProperty(property)
-        }
-        const propertyValue: T = await propertyHandle.jsonValue()
-        return propertyValue
-    }
-
-
-    // public async getValue(): Promise<string> {
-    //     return await this.getElementProperty<string>([this.valueProperty])
-    // }
-
-
-    // public async getInnerText(): Promise<string> {
-    //     const element = await this.getElement()
-    //     return await element.innerText()
-    // }
-
-
-    // public async getInnerElement(innerElementSelector: string): Promise<ElementHandle<SVGElement | HTMLElement>> {
-    //     const element = await this.getElement()
-    //     return await element.$(innerElementSelector)
-    // }
-
-    // public async getInnerElements(innerElementsSelector: string): Promise<ElementHandle<SVGElement | HTMLElement>[]> {
-    //     const element = await this.getElement()
-    //     return await element.$$(innerElementsSelector)
-    // }
-
-
-    // public async checkExistingText(textParams: string[]): Promise<void> {
-    //     const element = await this.getElement()
-    //     for (const text of textParams) {
-    //         await element.waitForSelector(
-    //             text.includes('"') ? `text=/${text}/s` : `text=${text}`, { timeout: this.timeoutElement })
-    //     }
-    // }
-
-
-    public async notExists(): Promise<void> {
-        await page.waitForSelector(this.selector, { state: 'detached', timeout: this.timeoutElement })
-    }
-
-
-    // public async innerElementNotExists(innerElementsSelector: string): Promise<void> {
-    //     const element = await this.getElement()
-    //     await element.waitForSelector(innerElementsSelector, { state: 'detached', timeout: this.timeoutElement })
-    // }
 
 
     public async checkActive(isActive: boolean): Promise<void> {
@@ -200,6 +160,11 @@ export class Element {
             error.message = 'Focused=' + isFocused + ' > ' + error.message + ' > ' + this.selector
             throw new Error(error.message)
         }
+    }
+
+
+    public async notExists(): Promise<void> {
+        await page.waitForSelector(this.selector, { state: 'detached', timeout: this.timeoutElement })
     }
 
 }

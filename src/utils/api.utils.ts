@@ -1,4 +1,4 @@
-import { Response, Request, Route } from 'playwright-core'
+import { Response, Request } from 'playwright-core'
 
 
 export type API = {
@@ -8,51 +8,10 @@ export type API = {
     readonly avoidParams?: string[]
 }
 
+
 export abstract class ApiInterception {
 
     private static readonly timeoutApi = 35000
-
-
-    static async waitForResponseObject<T>(api: API, timeout?: number): Promise<T> {
-        const response = await this.waitForResponse(api, timeout)
-        return await response.json() as T
-    }
-
-    static async waitForRequestObject<T>(api: API, requestMethod?: string, timeout?: number): Promise<T> {
-        const request = await this.waitForRequest(api, requestMethod, timeout)
-        return await request.postDataJSON() as T
-    }
-
-    static async waitForResponseRequestObject<T>(api: API, requestMethod?: string, timeout?: number): Promise<T> {
-        const request = await this.waitForRequest(api, requestMethod, timeout)
-        const responseRequest = await request.response()
-        return await responseRequest.json() as T
-    }
-
-    static async waitForRequestAndResponseObject<requestT, responseT>(
-        api: API, requestMethod?: string, timeout?: number
-    ): Promise<[requestT, responseT]> {
-        const request = await this.waitForRequest(api, requestMethod, timeout)
-        const responseRequest = await request.response()
-        return [await request.postDataJSON() as requestT, await responseRequest.json() as responseT]
-    }
-
-
-    static async waitForResponseString(api: API, timeout?: number): Promise<string> {
-        const response = await this.waitForResponse(api, timeout)
-        return await response.text()
-    }
-
-    static async waitForRequestString(api: API, requestMethod?: string, timeout?: number): Promise<string> {
-        const request = await this.waitForRequest(api, requestMethod, timeout)
-        return request.postData()
-    }
-
-    static async waitForResponseRequestString(api: API, requestMethod?: string, timeout?: number): Promise<string> {
-        const request = await this.waitForRequest(api, requestMethod, timeout)
-        const responseRequest = await request.response()
-        return await responseRequest.text()
-    }
 
 
     static async waitForResponse(api: API, timeout?: number): Promise<Response> {
@@ -106,18 +65,6 @@ export abstract class ApiInterception {
                 \nRequests list:\n${allRequests.join('\n')}`
             )
         }
-    }
-
-
-    static async mock(api: API, mockFilePath: string): Promise<(url: URL) => boolean> {
-        const apiUrl = (url: URL) => ApiInterception.urlIncludes(url.toString(), api.url, api.searchParams)
-        const mockRoute = (route: Route) => route.fulfill({ status: api.status, path: mockFilePath })
-        await page.route(apiUrl, mockRoute)
-        return apiUrl
-    }
-
-    static async unmock(apiUrl: (url: URL) => boolean): Promise<void> {
-        await page.unroute(apiUrl)
     }
 
 

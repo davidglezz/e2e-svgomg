@@ -13,7 +13,7 @@ export class SvgomgPage extends BasePage {
     constructor() {
         super()
         this.page = {
-            name: 'Svgomg Page',
+            name: 'SVGOMG Page',
             url: svgomgUrl,
             title: 'SVGOMG - SVGO\'s Missing GUI'
         }
@@ -154,11 +154,6 @@ export class SvgomgPage extends BasePage {
 
 
     public async openSvg(docsPath: string, fileName: string): Promise<void> {
-        // await Promise.all([
-        //     ApiInterception.waitForRequest({ url: '', status: 200, searchParams: ['w3', 'org'] }), // request?
-        //     this.uploadSvgDocument(docsPath, fileName)
-        // ])
-        // DOUBT
         await this.uploadSvgDocument(docsPath, fileName)
     }
 
@@ -191,11 +186,6 @@ export class SvgomgPage extends BasePage {
 
 
     public async resetSettings(): Promise<void> {
-        // await Promise.all([
-        //     ApiInterception.waitForRequest({ url: '', status: 200, searchParams: ['w3', 'org'] }), // request?
-        //     this.uploadSvgDocument(docsPath, fileName)
-        // ])
-        // DOUBT
         await this.settingsResetButton.click()
     }
 
@@ -227,11 +217,6 @@ export class SvgomgPage extends BasePage {
 
 
     public async clickSvgOption(): Promise<void> {
-        // await Promise.all([
-        //     ApiInterception.waitForRequest({ url: '', status: 200, searchParams: ['w3', 'org'] }), // request?
-        //     this.imageRadio.checkOption()
-        // ])
-        // DOUBT
         await this.imageRadio.checkOption()
         await this.svgOutput.exists()
         await this.svgOutput.checkActive(true)

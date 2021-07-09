@@ -11,10 +11,10 @@ const svgAttributeToCheck = 'fill-rule="evenodd"'
 
 describe('SVGOMG Page Test', () => {
 
-    test(`Navigate to - ${svgomgPage.page.name}`, async () => {
+    test('Navigate to SVGOMG', async () => {
         await svgomgPage.navigateTo()
     })
-    test(`Load & Check - ${svgomgPage.page.name}`, async () => {
+    test('Load & Check Page', async () => {
         await svgomgPage.check()
         await svgomgPage.loadComponents({
             activeToolBar: false,
@@ -25,13 +25,13 @@ describe('SVGOMG Page Test', () => {
         })
     })
 
-    test(`Click About Button - ${svgomgPage.page.name}`, async () => {
+    test('Click About Button', async () => {
         await svgomgPage.clickAbout()
     })
-    test(`Check - ${svgomgGithubReadmePage.page.name}`, async () => {
+    test('Check GitHub SVGOMG Readme Page', async () => {
         await svgomgGithubReadmePage.check()
     })
-    test(`Navigate back to - ${svgomgPage.page.name}`, async () => {
+    test('Navigate back to SVGOMG Page', async () => {
         await svgomgGithubReadmePage.navigateBack()
         await svgomgPage.check()
         await svgomgPage.loadComponents({
@@ -43,10 +43,10 @@ describe('SVGOMG Page Test', () => {
         })
     })
 
-    test(`Upload SVG - ${svgomgPage.page.name}`, async () => {
+    test('Upload SVG', async () => {
         await svgomgPage.openSvg(docsPath, svgImageName)
     })
-    test(`Check correctly uploaded SVG - ${svgomgPage.page.name}`, async () => {
+    test('Check correctly uploaded SVG', async () => {
         await svgomgPage.loadSvg({
             activeToolBar: true,
             hiddenMenu: true,
@@ -56,7 +56,7 @@ describe('SVGOMG Page Test', () => {
         })
     })
 
-    test(`Open Menu & Check - ${svgomgPage.page.name}`, async () => {
+    test('Open Menu & Check Page', async () => {
         await svgomgPage.clickMenuButton()
         await svgomgPage.loadComponents({
             activeToolBar: true,
@@ -66,10 +66,10 @@ describe('SVGOMG Page Test', () => {
             typeOfOutput: 'svg'
         })
     })
-    test(`Paste Markup SVG - ${svgomgPage.page.name}`, async () => {
+    test('Paste Markup SVG', async () => {
         await svgomgPage.fillMarkup(svgImageMarkup)
     })
-    test(`Check correctly pasted Markup SVG - ${svgomgPage.page.name}`, async () => {
+    test('Check correctly pasted Markup SVG', async () => {
         await svgomgPage.loadSvg({
             activeToolBar: true,
             hiddenMenu: true,
@@ -79,19 +79,19 @@ describe('SVGOMG Page Test', () => {
         })
     })
 
-    test(`Reset Settings - ${svgomgPage.page.name}`, async () => {
+    test('Reset Settings', async () => {
         await svgomgPage.resetSettings()
     })
-    test(`Check Decrease File Diff Percentage - ${svgomgPage.page.name}`, async () => {
+    test('Check Decrease File Diff Percentage', async () => {
         await svgomgPage.checkDiffPercentage('decrease')
     })
 
-    test(`Download & Check SVG - ${svgomgPage.page.name}`, async () => {
+    test('Download & Check SVG', async () => {
         await svgomgPage.downloadSvg(downloadedSvgName)
         svgomgPage.checkDownloadedSvg(downloadedSvgName, svgAttributeToCheck)
     })
 
-    test(`Open Menu & Check - ${svgomgPage.page.name}`, async () => {
+    test('Open Menu & Check Page', async () => {
         await svgomgPage.clickMenuButton()
         await svgomgPage.loadComponents({
             activeToolBar: true,
@@ -101,10 +101,10 @@ describe('SVGOMG Page Test', () => {
             typeOfOutput: 'svg'
         })
     })
-    test(`Click Demo - ${svgomgPage.page.name}`, async () => {
+    test('Click Demo', async () => {
         await svgomgPage.clickDemo()
     })
-    test(`Switch to Markup Output & Check - ${svgomgPage.page.name}`, async () => {
+    test('Switch to Markup Output & Check Page', async () => {
         await svgomgPage.clickCodeOption()
         await svgomgPage.loadComponents({
             activeToolBar: true,
@@ -114,16 +114,16 @@ describe('SVGOMG Page Test', () => {
             typeOfOutput: 'code'
         })
     })
-    test(`Reset Settings - ${svgomgPage.page.name}`, async () => {
+    test('Reset Settings', async () => {
         await svgomgPage.resetSettings()
     })
-    test(`Check "Remove XML Instructions" Switch - ${svgomgPage.page.name}`, async () => {
+    test('Check "Remove XML Instructions" Switch', async () => {
         await svgomgPage.removeXmlInstructionsSwitchCheck()
     })
-    test(`Check "Remove Comments" Switch - ${svgomgPage.page.name}`, async () => {
+    test('Check "Remove Comments" Switch', async () => {
         await svgomgPage.removeCommentsSwitchCheck()
     })
-    test(`Check "Remove Metadata" Switch - ${svgomgPage.page.name}`, async () => {
+    test('Check "Remove Metadata" Switch', async () => {
         await svgomgPage.removeMetadataSwitchCheck()
     })
 
