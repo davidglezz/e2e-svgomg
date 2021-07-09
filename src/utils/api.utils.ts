@@ -10,7 +10,7 @@ export type API = {
 
 export abstract class ApiInterception {
 
-    private static readonly timeoutApi = 30000
+    private static readonly timeoutApi = 35000
 
 
     static async waitForResponseObject<T>(api: API, timeout?: number): Promise<T> {

@@ -1,12 +1,9 @@
 import { BasePage } from 'pages/base.page'
 import { Element, Button } from 'components'
-import { TextInput } from 'components/form/inputs'
-import { CheckSpanInput, CheckSwitchInput } from 'svgomg/components'
-import { classNameProperty } from 'components/data'
-import { ComponentsStatusData } from 'svgomg/model'
+import { MarkupTextInput, CheckSpanInput } from 'components/inputs'
+import { ComponentsStatusData } from 'model'
 import { svgomgUrl, svgomgGithubUrl, svgomgGithubReadmeUrl } from 'data/routing.data'
-import { svgImageName } from 'docs'
-import { downloadsPath } from 'svgomg/downloads'
+import { docsPath } from 'docs'
 import { ApiInterception } from 'utils'
 import { readFileSync } from 'fs'
 
@@ -33,7 +30,7 @@ export class SvgomgPage extends BasePage {
 
     private readonly openSVGButton = new Button('div[role=button].load-file')
     private readonly pasteMarkupButton = new Button('span.label-txt:has-text("Paste markup")')
-    private readonly pasteMarkupText = new TextInput('textarea.paste-input')
+    private readonly pasteMarkupText = new MarkupTextInput('textarea.paste-input')
     private readonly demoButton = new Button('div[role=button].load-demo')
     private readonly contributeButton = new Button(`a[href="${svgomgGithubUrl}"]`)
     private readonly aboutButton = new Button(`a[href="${svgomgGithubReadmeUrl}"]`)
@@ -63,9 +60,11 @@ export class SvgomgPage extends BasePage {
     private readonly pluginsSection = new Element('section.plugins')
 
     private readonly removeXmlInstructionsCheckbox =
-        new CheckSwitchInput('input[type=checkbox][name=removeXMLProcInst]', 'label.setting-item-toggle')
-    private readonly removeCommentsCheckbox = new CheckSwitchInput('input[type=checkbox][name=removeComments]', 'label.setting-item-toggle')
-    private readonly removeMetadataCheckbox = new CheckSwitchInput('input[type=checkbox][name=removeMetadata]', 'label.setting-item-toggle')
+        new CheckSpanInput('input[type=checkbox][name=removeXMLProcInst]', 'label.setting-item-toggle')
+    private readonly removeCommentsCheckbox =
+        new CheckSpanInput('input[type=checkbox][name=removeComments]', 'label.setting-item-toggle')
+    private readonly removeMetadataCheckbox =
+        new CheckSpanInput('input[type=checkbox][name=removeMetadata]', 'label.setting-item-toggle')
     private readonly settingsResetButton = new Button('button.setting-reset')
 
 
@@ -182,7 +181,7 @@ export class SvgomgPage extends BasePage {
     public async fillMarkup(markupText: string): Promise<void> {
         await this.pasteMarkupButton.click()
         await this.pasteMarkupText.checkFocused(true)
-        await this.pasteMarkupText.fillVolatileValue(markupText) // Volatile ? DOUBT
+        await this.pasteMarkupText.fillValue(markupText)
     }
 
 
@@ -202,7 +201,7 @@ export class SvgomgPage extends BasePage {
 
 
     public async checkDiffPercentage(difference: 'increase' | 'decrease' | ''): Promise<void> {
-        expect(await this.diffResults.getElementProperty([classNameProperty])).toContain(difference)
+        expect(await this.diffResults.getElementProperty(['className'])).toContain(difference)
     }
 
 
@@ -211,23 +210,11 @@ export class SvgomgPage extends BasePage {
             page.waitForEvent('download'),
             this.downloadLinkButton.click()
         ])
-        await download.saveAs(downloadsPath + svgName)
+        await download.saveAs(docsPath + svgName)
     }
 
-    // public async getHrefSvg(): Promise<string> {
-    //     return await this.downloadLinkButton.getElementProperty(['href'])
-    // }
-
-    // public async getSvgInnerHtml(url: string): Promise<string> {
-    //     const newTab = await context.newPage()
-    //     await newTab.goto(url)
-    //     const svgInnerHtml = await newTab.innerHTML('svg')
-    //     await newTab.close()
-    //     return svgInnerHtml
-    // }
-
     public checkDownloadedSvg(svgName: string, attributeToCheck: string): void {
-        expect(readFileSync(downloadsPath + svgName, 'utf-8')).toContain(attributeToCheck)
+        expect(readFileSync(docsPath + svgName, 'utf-8')).toContain(attributeToCheck)
     }
 
 
@@ -258,21 +245,21 @@ export class SvgomgPage extends BasePage {
     }
 
 
-    public async removeXmlInstructionsCheck(): Promise<void> {
+    public async removeXmlInstructionsSwitchCheck(): Promise<void> {
         await this.removeXmlInstructionsCheckbox.uncheckOption()
         await this.xmlInstructionsCode.exists()
         await this.removeXmlInstructionsCheckbox.checkOption()
         await this.xmlInstructionsCode.notExists()
     }
 
-    public async removeCommentsCheck(): Promise<void> {
+    public async removeCommentsSwitchCheck(): Promise<void> {
         await this.removeCommentsCheckbox.uncheckOption()
         await this.commentCode.exists()
         await this.removeCommentsCheckbox.checkOption()
         await this.commentCode.notExists()
     }
 
-    public async removeMetadataCheck(): Promise<void> {
+    public async removeMetadataSwitchCheck(): Promise<void> {
         await this.removeMetadataCheckbox.uncheckOption()
         await this.metadataCode.exists()
         await this.removeMetadataCheckbox.checkOption()

@@ -9,6 +9,9 @@ E2E tests for SVGOMG application by Fernando Garcia Llorente - Automated Tests u
 1.	Configure the launch options in "jest-playwright.config.js"
 2.	Run "npm test"
 
+# Info
+-	Screenshot failures & Reports after test execution
+
 # Contribute
 - Submit bugs and feature requests
 - Review source code changes

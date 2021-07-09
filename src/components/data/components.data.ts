@@ -1,8 +1,0 @@
-export const valueProperty = 'value'
-export const validityProperty = 'validity'
-export const validProperty = 'valid'
-export const invalidProperty = 'invalid'
-export const hiddenProperty = 'hidden'
-export const disabledProperty = 'disabled'
-export const checkedProperty = 'checked'
-export const classNameProperty = 'className'

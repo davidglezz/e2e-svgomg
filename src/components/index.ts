@@ -1,2 +1,2 @@
-export * from 'components/non-form'
+export * from 'components/buttons'
 export * from 'components/element'

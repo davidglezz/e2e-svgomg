@@ -1,5 +1,4 @@
 import { ElementHandle, JSHandle } from 'playwright-core'
-import { disabledProperty, classNameProperty, valueProperty, hiddenProperty } from 'components/data'
 import waitForExpect from 'wait-for-expect'
 
 
@@ -8,12 +7,18 @@ export class Element {
     protected readonly selector: string
     protected readonly parentSelector: string
 
+    protected readonly disabledProperty = 'disabled'
+    protected readonly classNameProperty = 'className'
+    protected readonly valueProperty = 'value'
+    protected readonly hiddenProperty = 'hidden'
+
+
     constructor(selector: string, parentSelector?: string) {
         this.selector = parentSelector ? `${parentSelector} ${selector}` : selector
         this.parentSelector = parentSelector ? `${parentSelector}:has(${selector})` : undefined
     }
 
-    protected readonly timeoutElement = 30000
+    protected readonly timeoutElement = 35000
 
 
     protected async getElement(): Promise<ElementHandle<SVGElement | HTMLElement>> {
@@ -38,6 +43,16 @@ export class Element {
         throw new Error(`None of these innerHtmls: ${innerHtmls} >> were found in these elementInnerHtmls: ${elementInnerHtmls}`)
     }
 
+    protected async getElementByValue(values: string[]): Promise<ElementHandle<SVGElement | HTMLElement>> {
+        const elements = await this.getElements()
+        for (const element of elements) {
+            const propertyValue: string = (await (await element.getProperty(this.valueProperty)).jsonValue()).toString().toLowerCase()
+            if (propertyValue.includes(values[0].toLowerCase()) && (!values[1] || propertyValue.includes(values[1].toLowerCase()))) {
+                return element
+            }
+        }
+    }
+
     protected async getParentElement(): Promise<ElementHandle<SVGElement | HTMLElement>> {
         return await page.waitForSelector(this.parentSelector, { state: 'attached', timeout: this.timeoutElement })
     }
@@ -54,7 +69,7 @@ export class Element {
             if (hidden) {
                 if (await element.isVisible()) {
                     await waitForExpect(async () => {
-                        expect(await this.getElementProperty<string>([classNameProperty])).toContain(hiddenProperty)
+                        expect(await this.getElementProperty<string>([this.classNameProperty])).toContain(this.hiddenProperty)
                     }, this.timeoutElement)
                     return
                 }
@@ -80,7 +95,7 @@ export class Element {
             if (disabled) {
                 if (isEnabled && isEditable) {
                     await waitForExpect(async () => {
-                        expect(await this.getElementProperty<string>([classNameProperty])).toContain(disabledProperty)
+                        expect(await this.getElementProperty<string>([this.classNameProperty])).toContain(this.disabledProperty)
                     }, this.timeoutElement)
                     return
                 }
@@ -93,7 +108,7 @@ export class Element {
                 expect(await element.isEnabled()).toBeTruthy()
             }, this.timeoutElement)
             await waitForExpect(async () => {
-                expect(await this.getElementProperty<string>([classNameProperty])).not.toContain(disabledProperty)
+                expect(await this.getElementProperty<string>([this.classNameProperty])).not.toContain(this.disabledProperty)
             }, this.timeoutElement)
         } catch (error) {
             error.message = 'Disabled=' + disabled + ' > ' + error.message + ' > ' + this.selector
@@ -112,35 +127,35 @@ export class Element {
     }
 
 
-    public async getValue(): Promise<string> {
-        return await this.getElementProperty<string>([valueProperty])
-    }
+    // public async getValue(): Promise<string> {
+    //     return await this.getElementProperty<string>([this.valueProperty])
+    // }
 
 
-    public async getInnerText(): Promise<string> {
-        const element = await this.getElement()
-        return await element.innerText()
-    }
+    // public async getInnerText(): Promise<string> {
+    //     const element = await this.getElement()
+    //     return await element.innerText()
+    // }
 
 
-    public async getInnerElement(innerElementSelector: string): Promise<ElementHandle<SVGElement | HTMLElement>> {
-        const element = await this.getElement()
-        return await element.$(innerElementSelector)
-    }
+    // public async getInnerElement(innerElementSelector: string): Promise<ElementHandle<SVGElement | HTMLElement>> {
+    //     const element = await this.getElement()
+    //     return await element.$(innerElementSelector)
+    // }
 
-    public async getInnerElements(innerElementsSelector: string): Promise<ElementHandle<SVGElement | HTMLElement>[]> {
-        const element = await this.getElement()
-        return await element.$$(innerElementsSelector)
-    }
+    // public async getInnerElements(innerElementsSelector: string): Promise<ElementHandle<SVGElement | HTMLElement>[]> {
+    //     const element = await this.getElement()
+    //     return await element.$$(innerElementsSelector)
+    // }
 
 
-    public async checkExistingText(textParams: string[]): Promise<void> {
-        const element = await this.getElement()
-        for (const text of textParams) {
-            await element.waitForSelector(
-                text.includes('"') ? `text=/${text}/s` : `text=${text}`, { timeout: this.timeoutElement })
-        }
-    }
+    // public async checkExistingText(textParams: string[]): Promise<void> {
+    //     const element = await this.getElement()
+    //     for (const text of textParams) {
+    //         await element.waitForSelector(
+    //             text.includes('"') ? `text=/${text}/s` : `text=${text}`, { timeout: this.timeoutElement })
+    //     }
+    // }
 
 
     public async notExists(): Promise<void> {
@@ -148,21 +163,21 @@ export class Element {
     }
 
 
-    public async innerElementNotExists(innerElementsSelector: string): Promise<void> {
-        const element = await this.getElement()
-        await element.waitForSelector(innerElementsSelector, { state: 'detached', timeout: this.timeoutElement })
-    }
+    // public async innerElementNotExists(innerElementsSelector: string): Promise<void> {
+    //     const element = await this.getElement()
+    //     await element.waitForSelector(innerElementsSelector, { state: 'detached', timeout: this.timeoutElement })
+    // }
 
 
     public async checkActive(isActive: boolean): Promise<void> {
         try {
             isActive ?
                 await waitForExpect(async () => {
-                    expect(await this.getElementProperty<string>([classNameProperty])).toContain('active')
+                    expect(await this.getElementProperty<string>([this.classNameProperty])).toContain('active')
                 }, this.timeoutElement)
                 :
                 await waitForExpect(async () => {
-                    expect(await this.getElementProperty<string>([classNameProperty])).not.toContain('active')
+                    expect(await this.getElementProperty<string>([this.classNameProperty])).not.toContain('active')
                 }, this.timeoutElement)
         } catch (error) {
             error.message = 'Active=' + isActive + ' > ' + error.message + ' > ' + this.selector
@@ -175,11 +190,11 @@ export class Element {
         try {
             isFocused ?
                 await waitForExpect(async () => {
-                    expect(await this.getElementProperty<string>([classNameProperty])).toContain('focused')
+                    expect(await this.getElementProperty<string>([this.classNameProperty])).toContain('focused')
                 }, this.timeoutElement)
                 :
                 await waitForExpect(async () => {
-                    expect(await this.getElementProperty<string>([classNameProperty])).not.toContain('focused')
+                    expect(await this.getElementProperty<string>([this.classNameProperty])).not.toContain('focused')
                 }, this.timeoutElement)
         } catch (error) {
             error.message = 'Focused=' + isFocused + ' > ' + error.message + ' > ' + this.selector

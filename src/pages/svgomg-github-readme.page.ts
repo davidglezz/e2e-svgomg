@@ -7,7 +7,7 @@ export class SvgomgGithubReadmePage extends BasePage {
     constructor() {
         super()
         this.page = {
-            name: 'Svgomg Github Readme Page',
+            name: 'Github Svgomg Readme Page',
             url: svgomgGithubReadmeUrl,
             title: 'svgomg/README.md at master · jakearchibald/svgomg'
         }

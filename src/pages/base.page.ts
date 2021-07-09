@@ -10,7 +10,7 @@ export class BasePage {
         readonly title: string
     }
 
-    protected readonly timeoutBasePage = 30000
+    protected readonly timeoutBasePage = 35000
 
 
     public async navigateTo(): Promise<void> {
